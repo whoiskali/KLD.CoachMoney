@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="KLD.CoachMoney.Application/KLD.CoachMoney.Application.csproj" />
+  <Project Path="KLD.CoachMoney.Domain/KLD.CoachMoney.Domain.csproj" />
+  <Project Path="KLD.CoachMoney.Infrastructure/KLD.CoachMoney.Infrastructure.csproj" />
+  <Project Path="KLD.CoachMoney.AppHost/KLD.CoachMoney.AppHost.csproj" />
+  <Project Path="KLD.CoachMoney.ServiceDefaults/KLD.CoachMoney.ServiceDefaults.csproj" />
+  <Project Path="KLD.CoachMoney.Web/KLD.CoachMoney.Web.csproj" />
+</Solution>
