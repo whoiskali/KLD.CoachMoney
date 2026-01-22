@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Company.Template.Domain.Entities
+namespace KLD.CoachMoney.Domain.Entities
 {
     public class ExceptionLog
     {

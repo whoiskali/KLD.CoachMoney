@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using KLD.CoachMoney.Application.Abstractions;
+using KLD.CoachMoney.Domain.Abstracts;
+using KLD.CoachMoney.Domain.Entities;
+using KLD.CoachMoney.Domain.Entities;
+using KLD.CoachMoney.Domain.Enums;
+using KLD.CoachMoney.Infrastructure.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Company.Template.Application.Interfaces;
-using Company.Template.Domain;
-using Company.Template.Domain.Entities;
-using Company.Template.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,41 +14,39 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Company.Template.Infrastructure.Persistence.Contexts
+namespace KLD.CoachMoney.Infrastructure.Persistence.Contexts
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options), IApplicationDbContext
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options, ICurrentUser currentUser) : DbContext(options),
+      IApplicationDbContext
     {
+        public DbSet<User> Users { get; set; }
+        public DbSet<Debt> Debts { get; set; }
         public DbSet<AuditTrail> AuditTrails { get; set; }
         public DbSet<ExceptionLog> ExceptionLogs { get; set; }
 
-        #region Overrides
+        #region Overrides   
         public override async Task<int> SaveChangesAsync(
-            CancellationToken cancellationToken = default)
+    CancellationToken cancellationToken = default)
         {
             var auditEntries = new List<AuditTrail>();
-            var currentUser = "";
+            var utcNow = DateTime.UtcNow;
 
-            var entries = ChangeTracker.Entries()
-                .Where(e =>
-                    e.Entity is IAuditTrail &&
-                    e.Entity is not AuditTrail &&
-                    e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted)
+            var entries = ChangeTracker.Entries<AuditableEntity>()
+                .Where(e => e.State is EntityState.Added
+                         or EntityState.Modified
+                         or EntityState.Deleted)
                 .ToList();
 
             foreach (var entry in entries)
             {
-                var auditable = (IAuditTrail)entry.Entity;
-
                 if (entry.State == EntityState.Added)
                 {
-                    auditable.CreatedAt = DateTime.UtcNow;
-                    auditable.CreatedBy = currentUser;
+                    entry.Entity.SetCreated(currentUser.UserId, utcNow);
                 }
 
                 if (entry.State == EntityState.Modified)
                 {
-                    auditable.UpdatedAt = DateTime.UtcNow;
-                    auditable.UpdatedBy = currentUser;
+                    entry.Entity.SetUpdated(currentUser.UserId, utcNow);
                 }
 
                 auditEntries.Add(new AuditTrail
@@ -55,19 +55,21 @@ namespace Company.Template.Infrastructure.Persistence.Contexts
                     EntityId = GetPrimaryKey(entry),
                     Action = MapAction(entry.State),
                     Timestamp = DateTimeOffset.UtcNow,
-                    PerformedByName = currentUser,
+                    PerformedById = currentUser.UserId,
+                    PerformedByName = currentUser.Name,
                     Changes = BuildNestedDiff(entry)
                 });
             }
 
             var result = await base.SaveChangesAsync(cancellationToken);
 
-            // Save audits WITHOUT triggering audit logic again
             if (auditEntries.Any())
             {
                 ChangeTracker.AutoDetectChangesEnabled = false;
+
                 AuditTrails.AddRange(auditEntries);
                 await base.SaveChangesAsync(cancellationToken);
+
                 ChangeTracker.AutoDetectChangesEnabled = true;
             }
 

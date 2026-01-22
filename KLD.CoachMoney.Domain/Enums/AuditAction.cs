@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Company.Template.Domain.Enums
+namespace KLD.CoachMoney.Domain.Enums
 {
     public enum AuditAction
     {

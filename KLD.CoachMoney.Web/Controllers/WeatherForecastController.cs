@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace KLD.CoachMoney.Web.Controllers;
 
@@ -21,5 +22,31 @@ public class WeatherForecastController : ControllerBase
             Summary = Summaries[Random.Shared.Next(Summaries.Length)]
         })
         .ToArray();
+    }
+
+    [HttpGet("principal-name")]
+    public ActionResult<string> GetUserPrincipalName()
+    {
+        if (User?.Identity?.IsAuthenticated != true)
+        {
+            return Unauthorized();
+        }
+
+        // Common claim types that may contain a user principal name
+        var upn = User.FindFirst(ClaimTypes.Upn)?.Value
+               ?? User.FindFirst("upn")?.Value
+               ?? User.FindFirst("preferred_username")?.Value
+               ?? User.Identity?.Name
+               ?? User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+               ?? User.FindFirst(ClaimTypes.Email)?.Value;
+
+        if (string.IsNullOrWhiteSpace(upn))
+        {
+            return NotFound("User principal name not found.");
+        }
+
+        //throw new BaseBadRequestException();
+
+        return Ok(upn);
     }
 }
