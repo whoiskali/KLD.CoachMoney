@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/KLD.CoachMoney.AppHost/appsettings.Development.json
+/KLD.CoachMoney.Web/appsettings.Development.json
+/KLD.CoachMoney.AppHost/appsettings.Development.json
+/KLD.CoachMoney.Web/appsettings.Development.json
+/KLD.CoachMoney.AppHost/appsettings.Development.json

@@ -1,13 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Company.Template.Domain.Entities;
+using KLD.CoachMoney.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Company.Template.Infrastructure.Persistence.Configurations
+namespace KLD.CoachMoney.Infrastructure.Persistence.Configurations
 {
     internal class AuditTrailEntityConfiguration
     : IEntityTypeConfiguration<AuditTrail>
