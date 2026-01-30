@@ -22,8 +22,7 @@ namespace KLD.CoachMoney.Infrastructure.Identity
 
                 if (Guid.TryParse(value, out var userId))
                     return userId;
-
-                throw new InvalidOperationException("Authenticated user has no valid UserId claim.");
+                return Guid.Empty;
             }
         }
         public string Username

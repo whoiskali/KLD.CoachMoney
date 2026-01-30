@@ -7,14 +7,17 @@ using KLD.CoachMoney.Infrastructure.Auth;
 using KLD.CoachMoney.Infrastructure.Financial;
 using KLD.CoachMoney.Infrastructure.Identity;
 using KLD.CoachMoney.Infrastructure.Persistence.Contexts;
+using KLD.CoachMoney.Infrastructure.Persistence.Seeding;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,30 +31,29 @@ namespace KLD.CoachMoney.Infrastructure
             services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(
-                    configuration.GetConnectionString("local"),
+                    configuration.GetConnectionString("CoachMoneyDb"),
                     b => b.MigrationsAssembly($"{Assembly.GetAssembly(typeof(ApplicationDbContext))!.FullName}")
                 );
             });
 
-            var aiOptions = configuration
-                .GetSection("FinancialAi")
-                .Get<FinancialAiOptions>()
-                ?? throw new InvalidOperationException("FinancialAi config missing");
+            services.Configure<JwtOptions>(
+                configuration.GetSection("Jwt"));
 
-            services.AddSingleton(aiOptions);
+            services.Configure<FinancialAiOptions>(
+                configuration.GetSection("FinancialAi"));
 
-            services.AddHttpClient<IFinancialAiService, FinancialAiService>();
+            services.AddScoped<IFinancialAiService, FinancialAiService>();
 
-            var jwtOptions = configuration
-                .GetSection("Jwt")
-                .Get<JwtOptions>()
-                ?? throw new InvalidOperationException("Jwt config missing");
-
-            services.AddSingleton(jwtOptions);
-
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
+                    var serviceProvider = services.BuildServiceProvider();
+                    var jwtOptions =
+                        serviceProvider
+                            .GetRequiredService<IOptions<JwtOptions>>()
+                            .Value;
+
                     options.TokenValidationParameters = new TokenValidationParameters
                     {
                         ValidateIssuer = true,
@@ -69,13 +71,14 @@ namespace KLD.CoachMoney.Infrastructure
                     };
                 });
 
+
             services.AddAuthorization();
 
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
             services.AddScoped<ICurrentUser, CurrentUser>();
             services.AddScoped<ITokenService, JwtTokenService>();
-            services.AddScoped<IFinancialAiService, FinancialAiService>();
             services.AddScoped<IFinancialSnapshotProvider, FinancialSnapshotProvider>();
+            services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
 
         }
     }

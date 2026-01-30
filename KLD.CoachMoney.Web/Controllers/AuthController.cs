@@ -16,7 +16,7 @@ namespace KLD.CoachMoney.Web.Controllers
             [FromServices] ICommandHandler<GenerateToken.Command> handler,
             CancellationToken ct)
         {
-            var userId = Guid.NewGuid(); // TEMP
+            var userId = new Guid("AB1ED3DB-D321-48E5-879D-4CEBB5722FE5"); // TEMP
 
             var command = new GenerateToken.Command
             {

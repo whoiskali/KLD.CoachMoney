@@ -1,10 +1,17 @@
+using Aspire.Hosting;
 using Microsoft.VisualBasic;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-var sql = builder.AddSqlServer("sql")
+var sqlPassword = builder.AddParameterFromConfiguration(
+    "SqlServerPassword",
+    "Parameters:SqlServerPassword",
+    secret: true);
+
+var sql = builder.AddSqlServer("sqlserver", port: 55555)
+    .WithPassword(sqlPassword)
     .WithEnvironment("ACCEPT_EULA", "Y")
-    .WithEnvironment("SA_PASSWORD", "YourStrong!Passw0rd")
+    .WithLifetime(ContainerLifetime.Persistent)
     .AddDatabase("CoachMoneyDb");
 
 //var database = builder.AddConnectionString("local");

@@ -1,9 +1,13 @@
 @KLD.CoachMoney.Web_HostAddress = http://localhost:5112
-@token = PUT_JWT_TOKEN_HERE
 
 
 POST {{KLD.CoachMoney.Web_HostAddress}}/api/Auth/token
 Accept: application/json
+
+### Get Financial Advice
+GET {{KLD.CoachMoney.Web_HostAddress}}/api/v1/finance/advice
+Content-Type: application/json
+Authorization: {{token}}
 
 ###
 # Get current user's debts

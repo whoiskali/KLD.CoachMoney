@@ -1,11 +1,12 @@
 using Asp.Versioning;
 using KLD.CoachMoney.Application;
+using KLD.CoachMoney.Application.Abstractions;
 using KLD.CoachMoney.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
-
+builder.Logging.AddFilter("Microsoft.AspNetCore.Authentication", LogLevel.Debug);
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -35,6 +36,13 @@ app.MapDefaultEndpoints();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
+    using var scope = app.Services.CreateScope();
+
+    var seeder = scope.ServiceProvider
+        .GetRequiredService<IDatabaseSeeder>();
+
+    await seeder.SeedAsync();
 }
 
 app.UseHttpsRedirection();

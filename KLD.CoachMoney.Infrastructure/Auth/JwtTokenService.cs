@@ -1,4 +1,5 @@
 ﻿using KLD.CoachMoney.Application.Abstractions.Auth;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -10,9 +11,9 @@ public sealed class JwtTokenService : ITokenService
 {
     private readonly JwtOptions _options;
 
-    public JwtTokenService(JwtOptions options)
+    public JwtTokenService(IOptions<JwtOptions> options)
     {
-        _options = options;
+        _options = options.Value;
     }
 
     public string GenerateAccessToken(

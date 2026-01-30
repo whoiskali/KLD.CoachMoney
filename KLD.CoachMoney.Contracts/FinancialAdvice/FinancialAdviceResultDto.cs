@@ -2,15 +2,28 @@
 
 public sealed class FinancialAdviceResultDto
 {
-    // Short summary (1–3 sentences)
-    public string Summary { get; init; } = null!;
+    // Metadata
+    public DateTime GeneratedAt { get; init; }
 
-    // Key recommendations (ordered)
-    public IReadOnlyList<AdviceItemDto> Recommendations { get; init; } = [];
+    // Overall assessment
+    public string Summary { get; init; } = default!;
 
-    // Risk notes / warnings
-    public IReadOnlyList<string> Warnings { get; init; } = [];
+    // Main recommendation
+    public string PrimaryRecommendation { get; init; } = default!;
 
-    // Coaching / encouragement (optional)
-    public string? CoachingNote { get; init; }
+    // Step-by-step plan
+    public IReadOnlyList<string> ActionSteps { get; init; }
+        = Array.Empty<string>();
+
+    // Warnings / red flags
+    public IReadOnlyList<string> RiskAlerts { get; init; }
+        = Array.Empty<string>();
+
+    // Financial snapshot
+    public decimal TotalDebt { get; init; }
+    public decimal TotalMonthlyPayments { get; init; }
+    public decimal EstimatedPayoffMonths { get; init; }
+
+    // Confidence score (AI self-eval)
+    public int ConfidenceScore { get; init; } // 0–100
 }

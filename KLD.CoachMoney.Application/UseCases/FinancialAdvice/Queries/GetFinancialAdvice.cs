@@ -29,12 +29,10 @@ public static class GetFinancialAdvice
             Query query,
             CancellationToken ct)
         {
-            // 1️⃣ Build deterministic snapshot (NO AI here)
             var snapshot = await snapshotProvider.BuildAsync(
                 currentUser.UserId,
                 ct);
 
-            // 2️⃣ Let AI interpret the snapshot
             return await aiService.GetAdviceAsync(
                 snapshot,
                 query.Intent,

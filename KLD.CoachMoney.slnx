@@ -1,10 +1,9 @@
 <Solution>
-  <Project Path="KLD.CoachMoney.AppHost/KLD.CoachMoney.AppHost.csproj" />
   <Project Path="KLD.CoachMoney.Application/KLD.CoachMoney.Application.csproj" />
-  <Project Path="KLD.CoachMoney.Contracts/KLD.CoachMoney.Contracts.csproj" Id="e25e806a-84d6-4502-a44b-5652e29438c2" />
+  <Project Path="KLD.CoachMoney.Contracts/KLD.CoachMoney.Contracts.csproj" />
   <Project Path="KLD.CoachMoney.Domain/KLD.CoachMoney.Domain.csproj" />
   <Project Path="KLD.CoachMoney.Infrastructure/KLD.CoachMoney.Infrastructure.csproj" />
+  <Project Path="KLD.CoachMoney.AppHost/KLD.CoachMoney.AppHost.csproj" />
   <Project Path="KLD.CoachMoney.ServiceDefaults/KLD.CoachMoney.ServiceDefaults.csproj" />
-  <Project Path="KLD.CoachMoney.UnitTest/KLD.CoachMoney.UnitTest.csproj" Id="ff3b38af-b5af-4bf3-9d58-be4d0d1177f2" />
   <Project Path="KLD.CoachMoney.Web/KLD.CoachMoney.Web.csproj" />
 </Solution>

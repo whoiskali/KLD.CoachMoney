@@ -18,6 +18,8 @@ namespace KLD.CoachMoney.Domain.Entities
         public decimal? CreditorMinimumPayment { get; private set; }
         public DateTime DueDate { get; private set; }
 
+        public User User { get; private set; } = null!;
+
         // EF Core only
         private Debt() { }
 

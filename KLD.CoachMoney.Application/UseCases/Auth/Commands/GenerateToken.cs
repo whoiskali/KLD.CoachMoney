@@ -32,7 +32,7 @@ public static class GenerateToken
 
             command.Result = new AuthResultDto
             {
-                AccessToken = token
+                AccessToken = token,
             };
 
             return Task.CompletedTask;
