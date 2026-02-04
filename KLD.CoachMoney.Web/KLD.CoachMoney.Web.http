@@ -1,6 +1,41 @@
 @KLD.CoachMoney.Web_HostAddress = http://localhost:5112
 
-GET {{KLD.CoachMoney.Web_HostAddress}}/weatherforecast/
+
+POST {{KLD.CoachMoney.Web_HostAddress}}/api/Auth/token
 Accept: application/json
 
+### Get Financial Advice
+GET {{KLD.CoachMoney.Web_HostAddress}}/api/v1/finance/advice
+Content-Type: application/json
+Authorization: {{token}}
+
+###
+# Get current user's debts
+GET {{KLD.CoachMoney.Web_HostAddress}}/api/v1/debts
+# Authorization: Bearer {{token}}
+Accept: application/json
+
+###
+# Add a new debt
+POST {{KLD.CoachMoney.Web_HostAddress}}/api/v1/debts
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "creditor": "BPI Credit Card",
+  "type": "CreditCard",
+  "amount": 15000,
+  "dueDate": "2026-02-15T00:00:00Z"
+}
+
+###
+# Apply payment to a debt
+@debtId = PUT_DEBT_ID_HERE
+POST {{KLD.CoachMoney.Web_HostAddress}}/api/v1/debts/{{debtId}}/payment
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "amount": 5000
+}
 ###

@@ -1,11 +1,11 @@
-﻿using Company.Template.Domain.Enums;
+﻿using KLD.CoachMoney.Domain.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Company.Template.Domain.Entities
+namespace KLD.CoachMoney.Domain.Entities
 {
     public class AuditTrail
     {
@@ -21,7 +21,7 @@ namespace Company.Template.Domain.Entities
         public string? Changes { get; set; }      // JSON
 
         // Metadata
-        public string PerformedById { get; set; } = default!;
+        public Guid PerformedById { get; set; } = default!;
         public string PerformedByName { get; set; } = default!;
         public DateTimeOffset Timestamp { get; set; }
     }

@@ -1,16 +1,28 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using KLD.CoachMoney.Application.Abstractions;
+using KLD.CoachMoney.Application.Abstractions.AiServices;
+using KLD.CoachMoney.Application.Abstractions.AIServices;
+using KLD.CoachMoney.Application.Abstractions.Auth;
+using KLD.CoachMoney.Infrastructure.AI;
+using KLD.CoachMoney.Infrastructure.Auth;
+using KLD.CoachMoney.Infrastructure.Financial;
+using KLD.CoachMoney.Infrastructure.Identity;
+using KLD.CoachMoney.Infrastructure.Persistence.Contexts;
+using KLD.CoachMoney.Infrastructure.Persistence.Seeding;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Company.Template.Application.Interfaces;
-using Company.Template.Infrastructure.Persistence.Contexts;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Company.Template.Infrastructure
+namespace KLD.CoachMoney.Infrastructure
 {
     public static class DependencyInjection
     {
@@ -19,12 +31,55 @@ namespace Company.Template.Infrastructure
             services.AddDbContext<ApplicationDbContext>(options =>
             {
                 options.UseSqlServer(
-                    configuration.GetConnectionString("local"),
+                    configuration.GetConnectionString("CoachMoneyDb"),
                     b => b.MigrationsAssembly($"{Assembly.GetAssembly(typeof(ApplicationDbContext))!.FullName}")
                 );
             });
 
+            services.Configure<JwtOptions>(
+                configuration.GetSection("Jwt"));
+
+            services.Configure<FinancialAiOptions>(
+                configuration.GetSection("FinancialAi"));
+
+            services.AddScoped<IFinancialAiService, FinancialAiService>();
+
+            services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    var serviceProvider = services.BuildServiceProvider();
+                    var jwtOptions =
+                        serviceProvider
+                            .GetRequiredService<IOptions<JwtOptions>>()
+                            .Value;
+
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+
+                        ValidIssuer = jwtOptions.Issuer,
+                        ValidAudience = jwtOptions.Audience,
+                        IssuerSigningKey =
+                            new SymmetricSecurityKey(
+                                Encoding.UTF8.GetBytes(jwtOptions.Key)),
+
+                        ClockSkew = TimeSpan.Zero
+                    };
+                });
+
+
+            services.AddAuthorization();
+
             services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
+            services.AddScoped<ICurrentUser, CurrentUser>();
+            services.AddScoped<ITokenService, JwtTokenService>();
+            services.AddScoped<IFinancialSnapshotProvider, FinancialSnapshotProvider>();
+            services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
+
         }
     }
 }
